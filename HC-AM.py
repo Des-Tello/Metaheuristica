@@ -43,10 +43,10 @@ class GreedyDeterminista:
         for i in range(len(solucion)):
             if i == 0:
                 tiempo += dic_uav[solucion[i]].tiempo_temprano
-            else:
-                tiempo += dic_uav[solucion[i]].tiempo_separacion[solucion[i-1]]
-                if tiempo >= dic_uav[solucion[i]].tiempo_preferente:
-                    costo += tiempo - dic_uav[solucion[i]].tiempo_preferente
+
+            tiempo += dic_uav[solucion[i]].tiempo_separacion[solucion[i-1]]
+            costo += abs(tiempo - dic_uav[solucion[i]].tiempo_preferente)
+
         return costo, tiempo
                  
     def generar_vecinos(self, sol_actual, indice):
@@ -70,8 +70,8 @@ class GreedyDeterminista:
         mejor_puntaje, tiempo_f = self.ValueFo(solucion_inicial)
         mejor_sol = solucion_inicial.copy()
         
-        print(f"Puntaje actual: {mejor_puntaje}")
-        print(f"Tiempo: {tiempo_f}")
+        print(f"Costo Actual: {mejor_puntaje}")
+        print(f"Tiempo Actual: {tiempo_f}")
         
         for a in range(100):
             idx = random.randint(0, self.n_uavs - 1)
@@ -85,16 +85,16 @@ class GreedyDeterminista:
                     tiempo_f = tiempo
                     break
 
-        print(f"Puntaje actual: {mejor_puntaje}")
-        print(f"Tiempo: {tiempo}") 
+        print(f"Costo Final: {mejor_puntaje}")
+        print(f"Tiempo Final: {tiempo_f}") 
 
 
 
         return mejor_sol
 
 if __name__ == "__main__":
-    problem_titan = GreedyDeterminista("./t2_Europa.txt")
-    sol_greedy = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
+    problem_titan = GreedyDeterminista("./t2_Titan.txt")
+    sol_greedy = [2, 3, 4, 5, 6, 7, 8, 0, 9, 13, 12, 1, 11, 10, 14]
 
     sol = problem_titan.solve(sol_greedy)
 
