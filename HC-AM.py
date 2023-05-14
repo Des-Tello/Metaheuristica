@@ -101,7 +101,7 @@ class GreedyDeterminista:
 
         x = [item[0] for item in graph]
         y = [item[1] for item in graph]
-
+ 
         color_map = LinearSegmentedColormap.from_list('ColorMap', ['red', 'yellow', 'green'])
         fig, ax = plt.subplots()
 
@@ -115,9 +115,12 @@ class GreedyDeterminista:
 
         ax.set_xlim(min(x), max(x))
         ax.set_ylim(min(y), max(y))
+        points_to_annotate = np.linspace(0, len(graph) - 1, 4, dtype=int)
 
-        for tup in graph:
-            ax.annotate(tup[1], (tup[0], tup[1]), textcoords="offset points", xytext=(0,10), ha='center')
+
+        for i in points_to_annotate:
+            tup = graph[i]
+            ax.annotate(tup[1], (tup[0], tup[1]), textcoords="offset points", xytext=(0, 10), ha='center')
 
         plt.show()
 
@@ -125,8 +128,8 @@ class GreedyDeterminista:
         return mejor_sol
 
 if __name__ == "__main__":
-    problem_titan = GreedyDeterminista("./t2_Titan.txt")
-    sol_greedy = [2, 3, 4, 5, 6, 7, 8, 0, 9, 13, 12, 1, 11, 10, 14]
+    problem_titan = GreedyDeterminista("./t2_Europa.txt")
+    sol_greedy = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
     sol = problem_titan.solve(sol_greedy)
 
     print(sol)
