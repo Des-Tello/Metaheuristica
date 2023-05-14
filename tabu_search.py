@@ -1,4 +1,8 @@
 import random
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.colors import LinearSegmentedColormap
+
 class UAV:
     def __init__(self, index:int, tiempo_temprano:int, tiempo_preferente:int, tiempo_tarde:int):
         self.index = index
@@ -70,36 +74,87 @@ class GreedyDeterminista:
         mejor_puntaje, tiempo_f = self.ValueFo(solucion_inicial)
         mejor_sol = solucion_inicial.copy()
         contador = 0
+        tabu_list = list()
+        tabu_list_max_len = 70
+        graph = []
 
         print(f"Costo Actual: {mejor_puntaje}")
         print(f"Tiempo Actual: {tiempo_f}")
         
+
+        # MIENTRAS NO SE CUMPLA EL CRITERIO DE PARADA
         for a in range(100):
+            # GENERACIÓN DE VECINOS
             idx = random.randint(0, self.n_uavs - 1)
-            vecinos = self.generar_vecinos(mejor_sol, idx)
+            vecinos = self.generar_vecinos(list(mejor_sol), idx)
             mov = False
-            # Mejor Mejora -> Reviso todos los vecinos
+
+            dict_vecinos = dict()
             for vecino in vecinos:
                 puntaje_actual, tiempo = self.ValueFo(vecino)
-                if puntaje_actual < mejor_puntaje:
-                    mejor_puntaje = puntaje_actual
-                    mejor_sol = vecino
-                    tiempo_f = tiempo
-                    mov = True
-            if mov:
-                contador+=1
+                dict_vecinos[tuple(vecino)] = puntaje_actual
+
+            diccionario_ordenado = dict(sorted(dict_vecinos.items(), key=lambda x: x[1]))
+
+            # SELECCIÓN DE LA MEJOR SOLUCIÓN NO TABÚ
+            for k in diccionario_ordenado:
+                if k not in tabu_list:
+                    # ALMACENA LA SOLUCION ACTUAL
+                    sol_actual = k
+
+                    if len(tabu_list) == tabu_list_max_len:
+                        tabu_list.pop(0)
+                    tabu_list.append(k)
+                    break
+            
+            # SI EL PUNTAJE DE LA SOLUCIÓN ACTUAL ES MEJOR QUE EL PUNTAJE DE LA SOLUCIÓN MEJOR
+            puntaje_sol_actual, tiempo_sol_actual = self.ValueFo(sol_actual)
+
+            if puntaje_sol_actual < mejor_puntaje:
+                mejor_sol = sol_actual
+                mejor_puntaje = puntaje_sol_actual
+                tiempo_f = tiempo_sol_actual
+                contador += 1
+
+                tupla_aux = (contador, mejor_puntaje)
+                graph.append(tupla_aux)
+        
 
         print(f"Costo Final: {mejor_puntaje}")
         print(f"Tiempo Final: {tiempo_f}") 
         print(f"# Movimientos: {contador}") 
 
+        x = [item[0] for item in graph]
+        y = [item[1] for item in graph]
+ 
+        color_map = LinearSegmentedColormap.from_list('ColorMap', ['red', 'yellow', 'green'])
+        fig, ax = plt.subplots()
 
+        for i in range(len(x) - 1):
+            color = color_map(i / (len(x) - 1))  # Interpolación del color
+            ax.plot([x[i], x[i+1]], [y[i], y[i+1]], color=color, linewidth=2)
+
+        ax.set_title('Mejora por movimiento')
+        ax.set_xlabel('Movimiento')
+        ax.set_ylabel('Valor FO')
+
+        ax.set_xlim(min(x), max(x))
+        ax.set_ylim(min(y), max(y))
+        points_to_annotate = np.linspace(0, len(graph) - 1, 4, dtype=int)
+
+
+        for i in points_to_annotate:
+            tup = graph[i]
+            ax.annotate(tup[1], (tup[0], tup[1]), textcoords="offset points", xytext=(0, 10), ha='center')
+
+        plt.show()
 
         return mejor_sol
 
 if __name__ == "__main__":
-    problem_titan = GreedyDeterminista("./t2_Titan.txt")
-    sol_greedy = [2, 3, 4, 5, 6, 7, 8, 0, 9, 13, 12, 1, 11, 10, 14]
+    problem_titan = GreedyDeterminista("./t2_Europa.txt")
+    sol_greedy = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
+
 
     sol = problem_titan.solve(sol_greedy)
 
