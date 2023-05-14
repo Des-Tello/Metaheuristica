@@ -46,20 +46,62 @@ class GreedyDeterminista:
                 continue
 
             tiempo += dic_uav[solucion[i]].tiempo_separacion[solucion[i-1]]
-
             costo += abs(tiempo - dic_uav[solucion[i]].tiempo_preferente)
-            
 
         return costo, tiempo
                  
+    def generar_vecinos(self, sol_actual, indice):
+        vecinos_generados = []
+        
+        # Swap adelante
+        for i in range(indice + 1, len(sol_actual)):
+            nuevo_arreglo = sol_actual.copy()
+            nuevo_arreglo[indice], nuevo_arreglo[i] = nuevo_arreglo[i], nuevo_arreglo[indice]
+            vecinos_generados.append(nuevo_arreglo)
+        
+        # Swap atras
+        for i in range(indice - 1, -1, -1):
+            nuevo_arreglo = sol_actual.copy()
+            nuevo_arreglo[indice], nuevo_arreglo[i] = nuevo_arreglo[i], nuevo_arreglo[indice]
+            vecinos_generados.append(nuevo_arreglo)
+        
+        return vecinos_generados
+                 
+    def solve(self, solucion_inicial):
+        mejor_puntaje, tiempo_f = self.ValueFo(solucion_inicial)
+        mejor_sol = solucion_inicial.copy()
+        contador = 0
+        
+        print(f"Costo Actual: {mejor_puntaje}")
+        print(f"Tiempo Actual: {tiempo_f}")
+        
+        for a in range(100):
+            idx = random.randint(0, self.n_uavs - 1)
+            vecinos = self.generar_vecinos(mejor_sol, idx)
+            mov = False
+            # Mejor Mejora -> Reviso todos los vecinos
+            for vecino in vecinos:
+                puntaje_actual, tiempo = self.ValueFo(vecino)
+                if puntaje_actual < mejor_puntaje:
+                    mejor_puntaje = puntaje_actual
+                    mejor_sol = vecino
+                    tiempo_f = tiempo
+                    mov = True
+            if mov:
+                contador+=1
+
+        print(f"Costo Final: {mejor_puntaje}")
+        print(f"Tiempo Final: {tiempo_f}") 
+        print(f"# Movimientos: {contador}") 
 
 
+
+        return mejor_sol
 
 if __name__ == "__main__":
     problem_titan = GreedyDeterminista("./t2_Titan.txt")
-    sol_greedy = [3, 2, 4, 5, 6, 7, 8, 0, 9, 11, 12, 1, 13, 10, 14]
-    # sol_greedy = [2, 3, 4, 5, 6, 7, 8, 0, 9, 13, 12, 1, 11, 10, 14] original 19
+    sol_greedy = [2, 3, 4, 5, 6, 7, 8, 0, 9, 13, 12, 1, 11, 10, 14]
 
-    sol = problem_titan.ValueFo(sol_greedy)
+    sol = problem_titan.solve(sol_greedy)
 
     print(sol)

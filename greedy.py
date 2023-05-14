@@ -43,29 +43,28 @@ class GreedyDeterminista:
                 orden_llegada.append(uav)
                 continue
 
-            # tiempo += orden_llegada[-1].tiempo_separacion[uav.index]
             tiempo += uav.tiempo_separacion[orden_llegada[-1].index]
             if tiempo < uav.tiempo_preferente:
                 print(f"[<] Atterriza antes UAV {uav.index} - {tiempo}/{uav.tiempo_preferente} ")
                 puntaje += abs(tiempo - uav.tiempo_preferente)
 
-            if tiempo > uav.tiempo_preferente:
+            elif tiempo > uav.tiempo_preferente:
                 print(f"[>] Atterriza despues UAV {uav.index} - {tiempo}/{uav.tiempo_preferente} ")
                 puntaje += abs(tiempo - uav.tiempo_preferente)
 
-            if tiempo == uav.tiempo_preferente:
+            elif tiempo == uav.tiempo_preferente:
                 print(f"[=] Atterriza correctamente UAV {uav.index} - {tiempo}/{uav.tiempo_preferente}")
     
                 
             orden_llegada.append(uav)
 
         print(f"Puntaje: {puntaje}")
-        print(f"Orden De Llegada: {[uav.index for uav in UAVS]}")
-        print(f"Orden 2: {[uav.index for uav in orden_llegada]}")
+        # print(f"Orden De Llegada: {[uav.index for uav in UAVS]}")
+        print(f"Orden de llegada Greedy Determinista: {[uav.index for uav in orden_llegada]}")
 
 
     
 
 if __name__ == "__main__":
-    problem_titan = GreedyDeterminista("./t2_Titan.txt")
+    problem_titan = GreedyDeterminista("./t2_Deimos.txt")
     problem_titan.solve()
